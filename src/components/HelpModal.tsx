@@ -84,11 +84,8 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
           <div className="help-section">
             <h3>⚙️ 設定項目の説明</h3>
             <ul>
-              <li><strong>リアルタイムカウント</strong>：入力中に自動で文字数をカウント</li>
               <li><strong>改行を文字数に含める</strong>：改行文字を文字数に含めるかどうか</li>
-              <li><strong>空白・タブを除外</strong>：スペース、全角スペース、タブを除外</li>
-              <li><strong>原稿用紙ルール適用</strong>：句読点や記号の原稿用紙ルールを適用</li>
-              <li><strong>文字正規化</strong>：Unicode正規化の方法を選択</li>
+              <li><strong>カウントから除外する文字</strong>：指定した文字をすべてカウント対象から除外</li>
             </ul>
           </div>
 
@@ -114,8 +111,8 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
           <div className="help-section">
             <h3>💡 使用例</h3>
             <div className="example-text">
-              <p><strong>小説・論文</strong>：原稿用紙ルールをONにして、句読点や記号の正確なカウント</p>
-              <p><strong>SNS投稿</strong>：文字数制限の確認、空白除外で実際の文字数を把握</p>
+              <p><strong>小説・論文</strong>：原稿用紙換算で分量の目安を確認</p>
+              <p><strong>SNS投稿</strong>：文字数制限の確認、除外文字で実際の文字数を調整</p>
               <p><strong>技術文書</strong>：各種エンコーディングでのバイト数確認</p>
               <p><strong>翻訳作業</strong>：文字数ベースの翻訳料金計算</p>
             </div>

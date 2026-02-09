@@ -19,9 +19,7 @@ export interface TextCountResult {
 
 export interface CountOptions {
   includeNewlines: boolean;
-  excludeSpaces: boolean;
-  useManuscriptRules: boolean;
-  normalization: 'none' | 'NFC' | 'NFKC';
+  excludeCharacters: string;
 }
 
 export class TextCounter {
@@ -38,12 +36,12 @@ export class TextCounter {
   };
 
   static countText(text: string, options: CountOptions): TextCountResult {
-    // 正規化
     let normalizedText = text;
-    if (options.normalization === 'NFC') {
-      normalizedText = text.normalize('NFC');
-    } else if (options.normalization === 'NFKC') {
-      normalizedText = text.normalize('NFKC');
+    if (options.excludeCharacters) {
+      const excludeSet = new Set(Array.from(options.excludeCharacters));
+      normalizedText = Array.from(text)
+        .filter((char) => !excludeSet.has(char))
+        .join('');
     }
 
     // 基本カウント
@@ -54,16 +52,13 @@ export class TextCounter {
     const lines = this.countLines(normalizedText);
     
     // 空白除外カウント
-    let charactersExcludingSpaces = totalCharacters;
-    if (options.excludeSpaces) {
-      charactersExcludingSpaces = normalizedText.replace(/[\s\t\u3000]/g, '').length;
-    }
+    const charactersExcludingSpaces = normalizedText.replace(/[\s\t\u3000]/g, '').length;
     
     // バイト数計算
     const bytes = this.calculateBytes(normalizedText);
     
     // 原稿用紙換算
-    const manuscriptPages = this.calculateManuscriptPages(normalizedText, options.useManuscriptRules);
+    const manuscriptPages = this.calculateManuscriptPages(normalizedText);
     
     // 文字頻度
     const characterFrequency = this.calculateCharacterFrequency(normalizedText);
@@ -128,14 +123,8 @@ export class TextCounter {
     };
   }
 
-  private static calculateManuscriptPages(text: string, useManuscriptRules: boolean): number {
-    if (!useManuscriptRules) {
-      // 通常の400字詰め計算
-      const charCount = text.replace(/[\r\n]/g, '').length;
-      return Math.round((charCount / 400) * 10) / 10; // 小数第2位四捨五入
-    }
-
-    // 原稿用紙ルール適用
+  private static calculateManuscriptPages(text: string): number {
+    // 原稿用紙ルール適用（固定）
     let manuscriptCharCount = 0;
     
     for (const char of text) {

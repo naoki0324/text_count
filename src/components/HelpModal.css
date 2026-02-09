@@ -13,7 +13,7 @@
 }
 
 .help-modal {
-  background: white;
+  background: var(--cream-0);
   border-radius: 16px;
   max-width: 800px;
   max-height: 90vh;
@@ -28,9 +28,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  padding: 1.2rem 1.6rem;
+  background: linear-gradient(135deg, #c58a58 0%, #b37241 100%);
+  color: #fff7ec;
 }
 
 .help-modal-header h2 {
@@ -42,7 +42,7 @@
 .close-button {
   background: none;
   border: none;
-  color: white;
+  color: #fff7ec;
   font-size: 2rem;
   cursor: pointer;
   padding: 0;
@@ -56,7 +56,7 @@
 }
 
 .close-button:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 247, 236, 0.2);
 }
 
 .help-modal-content {
@@ -74,22 +74,22 @@
 }
 
 .help-section h3 {
-  color: #2d3748;
+  color: var(--coffee-900);
   font-size: 1.2rem;
   font-weight: 600;
   margin: 0 0 1rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid #eadcc8;
 }
 
 .help-section p {
-  color: #4a5568;
+  color: var(--coffee-700);
   line-height: 1.6;
   margin: 0 0 1rem 0;
 }
 
 .help-section ul {
-  color: #4a5568;
+  color: var(--coffee-700);
   line-height: 1.6;
   margin: 0 0 1rem 0;
   padding-left: 1.5rem;
@@ -100,23 +100,23 @@
 }
 
 .help-section strong {
-  color: #2d3748;
+  color: var(--coffee-900);
   font-weight: 600;
 }
 
 .note {
-  background: #fff5f5;
-  border: 1px solid #fed7d7;
+  background: #fff1e6;
+  border: 1px solid #f0c7a4;
   border-radius: 8px;
   padding: 1rem;
-  color: #c53030;
+  color: #a4531b;
   font-size: 0.875rem;
   margin-top: 1rem;
 }
 
 .example-text {
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
+  background: #fbf4e8;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1rem;
 }
@@ -131,14 +131,14 @@
 
 .help-modal-footer {
   padding: 1.5rem 2rem;
-  background: #f7fafc;
-  border-top: 1px solid #e2e8f0;
+  background: #f7eddc;
+  border-top: 1px solid var(--border);
   text-align: center;
 }
 
 .close-button-large {
-  background: #4299e1;
-  color: white;
+  background: var(--accent-500);
+  color: #fff7ec;
   border: none;
   border-radius: 8px;
   padding: 0.75rem 2rem;
@@ -149,7 +149,7 @@
 }
 
 .close-button-large:hover {
-  background: #3182ce;
+  background: var(--accent-600);
   transform: translateY(-1px);
 }
 
@@ -159,17 +159,17 @@
 }
 
 .help-modal-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f1e4d0;
   border-radius: 4px;
 }
 
 .help-modal-content::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: #cbb8a5;
   border-radius: 4px;
 }
 
 .help-modal-content::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: #b8a28d;
 }
 
 /* レスポンシブ */

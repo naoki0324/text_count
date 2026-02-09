@@ -1,29 +1,11 @@
 import { CountOptions } from './textCounter';
 
 export interface AppSettings extends CountOptions {
-  realtimeMode: boolean;
-  autoSave: boolean;
-  showCharacterFrequency: boolean;
-  debounceDelay: number;
-  displayFormat: {
-    useThousandsSeparator: boolean;
-    showUnits: boolean;
-  };
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  realtimeMode: true,
-  autoSave: true,
   includeNewlines: true,
-  excludeSpaces: false,
-  useManuscriptRules: true,
-  normalization: 'none',
-  showCharacterFrequency: false,
-  debounceDelay: 300,
-  displayFormat: {
-    useThousandsSeparator: true,
-    showUnits: true
-  }
+  excludeCharacters: ''
 };
 
 export class SettingsManager {
@@ -35,7 +17,10 @@ export class SettingsManager {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        return { ...DEFAULT_SETTINGS, ...parsed };
+        return {
+          includeNewlines: parsed.includeNewlines ?? DEFAULT_SETTINGS.includeNewlines,
+          excludeCharacters: parsed.excludeCharacters ?? DEFAULT_SETTINGS.excludeCharacters
+        };
       }
     } catch (error) {
       console.warn('Failed to load settings:', error);

@@ -15,6 +15,7 @@ function App() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const debounceDelay = 250;
 
   // 設定の保存
   useEffect(() => {
@@ -23,10 +24,8 @@ function App() {
 
   // テキストの自動保存
   useEffect(() => {
-    if (settings.autoSave) {
-      SettingsManager.saveText(text);
-    }
-  }, [text, settings.autoSave]);
+    SettingsManager.saveText(text);
+  }, [text]);
 
   // 初期テキストの読み込み
   useEffect(() => {
@@ -61,7 +60,7 @@ function App() {
   const debouncedCount = useCallback(
     TextCounter.debounce((inputText: string) => {
       performCount(inputText, settings);
-    }, settings.debounceDelay),
+    }, debounceDelay),
     [performCount, settings]
   );
 
@@ -69,25 +68,15 @@ function App() {
   const handleTextChange = useCallback((newText: string) => {
     setText(newText);
     
-    if (settings.realtimeMode) {
-      debouncedCount(newText, settings);
-    }
-  }, [settings.realtimeMode, debouncedCount]);
-
-  // 手動カウント実行
-  const handleManualCount = useCallback(() => {
-    performCount(text, settings);
-  }, [text, performCount]);
+    debouncedCount(newText);
+  }, [settings, debouncedCount]);
 
   // 設定変更
   const handleSettingsChange = useCallback((newSettings: Partial<AppSettings>) => {
     const updatedSettings = { ...settings, ...newSettings };
     setSettings(updatedSettings);
     
-    // リアルタイムモードが変更された場合、即座にカウント実行
-    if (newSettings.realtimeMode !== undefined && newSettings.realtimeMode) {
-      performCount(text, updatedSettings);
-    }
+    performCount(text, updatedSettings);
   }, [settings, text, performCount]);
 
   // ファイルドロップ処理
@@ -108,9 +97,7 @@ function App() {
       const fileContent = await FileUtils.importTextFile(file);
       setText(fileContent);
       
-      if (settings.realtimeMode) {
-        performCount(fileContent, settings);
-      }
+      performCount(fileContent, settings);
     } catch (error) {
       alert('ファイルの読み込みに失敗しました');
       console.error('File import error:', error);
@@ -137,30 +124,6 @@ function App() {
     }
   }, []);
 
-  // 結果のコピー
-  const handleCopyResults = useCallback(() => {
-    if (!countResult) return;
-    
-    const resultText = [
-      `総文字数: ${TextCounter.formatNumber(countResult.totalCharacters)}`,
-      `行数: ${TextCounter.formatNumber(countResult.lines)}`,
-      `原稿用紙換算: ${countResult.manuscriptPages} 枚`,
-      `UTF-8: ${TextCounter.formatNumber(countResult.bytes.utf8)} bytes`
-    ].join('\n');
-    
-    navigator.clipboard.writeText(resultText).then(() => {
-      alert('結果をクリップボードにコピーしました');
-    }).catch(() => {
-      alert('コピーに失敗しました');
-    });
-  }, [countResult]);
-
-  // 結果のエクスポート
-  const handleExportResults = useCallback(() => {
-    if (!countResult) return;
-    FileUtils.exportCountResult(countResult);
-  }, [countResult]);
-
   return (
     <div className="app">
       <header className="app-header">
@@ -177,7 +140,7 @@ function App() {
       </header>
 
       <main className="app-main">
-        <div className="input-section">
+        <div className="input-section layout-input">
           <TextInput
             value={text}
             onChange={handleTextChange}
@@ -190,14 +153,6 @@ function App() {
           
           <div className="input-actions">
             <button 
-              className="count-button"
-              onClick={handleManualCount}
-              disabled={!text.trim() || isCalculating}
-            >
-              {isCalculating ? '計算中...' : 'カウント実行'}
-            </button>
-            
-            <button 
               className="clear-button"
               onClick={handleClear}
               disabled={!text.trim()}
@@ -207,17 +162,14 @@ function App() {
           </div>
         </div>
 
-        <div className="results-section">
+        <div className="results-section layout-results">
           <CountResults
             result={countResult}
             isCalculating={isCalculating}
-            onCopy={handleCopyResults}
-            onExport={handleExportResults}
-            settings={settings}
           />
         </div>
 
-        <div className="settings-section">
+        <div className="settings-section layout-settings">
           <SettingsPanel
             settings={settings}
             onChange={handleSettingsChange}
