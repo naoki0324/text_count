@@ -32,8 +32,16 @@
 ## 🛠️ 技術仕様
 
 - **フレームワーク**: React 18 + TypeScript
-- **ビルドツール**: Vite
+- **ビルドツール**: Vite 7
 - **依存ライブラリ**: encoding-japanese（日本語エンコーディング対応）
+
+## 📝 更新履歴
+
+### 2026-03-06
+- **セキュリティ対応**: 依存パッケージの脆弱性 10件を修正（moderate 3件、high 7件 → 0件）
+  - `vite` v5 → v7（esbuild の開発サーバークロスオリジン脆弱性を解消）
+  - `@typescript-eslint/eslint-plugin` / `@typescript-eslint/parser` v6 → v8（minimatch ReDoS 脆弱性を解消）
+  - `@vitejs/plugin-react` v4.2 → v4.3（vite v7 対応）
 
 ## 🚀 セットアップ
 
