@@ -1,5 +1,8 @@
 import { encode } from 'encoding-japanese';
 
+const _textEncoder = new TextEncoder();
+const _spaceCharRegex = /[\s\u3000]/;
+
 export interface TextCountResult {
   totalCharacters: number;
   totalCharactersNoNewlines: number;
@@ -38,29 +41,15 @@ export class TextCounter {
   static countText(text: string, options: CountOptions): TextCountResult {
     let normalizedText = text;
     if (options.excludeCharacters) {
-      const excludeSet = new Set(Array.from(options.excludeCharacters));
-      normalizedText = Array.from(text)
-        .filter((char) => !excludeSet.has(char))
-        .join('');
+      const excludeSet = new Set(options.excludeCharacters);
+      normalizedText = [...text].filter((char) => !excludeSet.has(char)).join('');
     }
 
-    // 基本カウント
     const totalCharacters = normalizedText.length;
-    const totalCharactersNoNewlines = normalizedText.replace(/[\r\n]/g, '').length;
-    
-    // 行数カウント
-    const lines = this.countLines(normalizedText);
-    
-    // 空白除外カウント
-    const charactersExcludingSpaces = normalizedText.replace(/[\s\t\u3000]/g, '').length;
-    
-    // バイト数計算
+    const { lines, totalCharactersNoNewlines, charactersExcludingSpaces } =
+      this.countBasicMetrics(normalizedText);
     const bytes = this.calculateBytes(normalizedText);
-    
-    // 原稿用紙換算
     const manuscriptPages = this.calculateManuscriptPages(normalizedText);
-    
-    // 文字頻度
     const characterFrequency = this.calculateCharacterFrequency(normalizedText);
 
     return {
@@ -74,16 +63,50 @@ export class TextCounter {
     };
   }
 
-  private static countLines(text: string): number {
-    if (!text) return 0;
-    const lines = text.split(/\r\n|\r|\n/);
-    // 末尾の空行を除外
-    return lines.filter(line => line.length > 0).length;
+  private static countBasicMetrics(text: string): {
+    lines: number;
+    totalCharactersNoNewlines: number;
+    charactersExcludingSpaces: number;
+  } {
+    if (!text) return { lines: 0, totalCharactersNoNewlines: 0, charactersExcludingSpaces: 0 };
+
+    let newlineCount = 0;
+    let spaceCount = 0;
+    let lines = 0;
+    let currentLineHasContent = false;
+    let prevChar = '';
+
+    for (const char of text) {
+      if (char === '\n') {
+        newlineCount++;
+        spaceCount++;
+        if (prevChar !== '\r') {
+          if (currentLineHasContent) lines++;
+          currentLineHasContent = false;
+        }
+      } else if (char === '\r') {
+        newlineCount++;
+        spaceCount++;
+        if (currentLineHasContent) lines++;
+        currentLineHasContent = false;
+      } else {
+        if (_spaceCharRegex.test(char)) spaceCount++;
+        currentLineHasContent = true;
+      }
+      prevChar = char;
+    }
+    if (currentLineHasContent) lines++;
+
+    return {
+      lines,
+      totalCharactersNoNewlines: text.length - newlineCount,
+      charactersExcludingSpaces: text.length - spaceCount,
+    };
   }
 
   private static calculateBytes(text: string): TextCountResult['bytes'] {
     // UTF-8
-    const utf8Bytes = new TextEncoder().encode(text).length;
+    const utf8Bytes = _textEncoder.encode(text).length;
     
     // UTF-16LE
     const utf16leBytes = text.length * 2;

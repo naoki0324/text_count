@@ -42,6 +42,11 @@
   - `vite` v5 → v7（esbuild の開発サーバークロスオリジン脆弱性を解消）
   - `@typescript-eslint/eslint-plugin` / `@typescript-eslint/parser` v6 → v8（minimatch ReDoS 脆弱性を解消）
   - `@vitejs/plugin-react` v4.2 → v4.3（vite v7 対応）
+- **パフォーマンス改善**: キーストローク処理の効率化
+  - `TextEncoder` をモジュールレベルのシングルトン化（毎カウントのインスタンス化を排除）
+  - 文字数カウントの文字列スキャンを5回→1回に統合（`countBasicMetrics` による単一パス処理）
+  - `localStorage` へのテキスト保存を毎キーストロークから250msデバウンスに変更
+  - debounce関数を `useRef` で安定化（設定変更時のタイマードロップを修正）
 
 ## 🚀 セットアップ
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { TextCounter, TextCountResult, CountOptions } from './utils/textCounter';
 import { SettingsManager, AppSettings } from './utils/settings';
 import { FileUtils } from './utils/fileUtils';
@@ -21,11 +21,6 @@ function App() {
   useEffect(() => {
     SettingsManager.saveSettings(settings);
   }, [settings]);
-
-  // テキストの自動保存
-  useEffect(() => {
-    SettingsManager.saveText(text);
-  }, [text]);
 
   // 初期テキストの読み込み
   useEffect(() => {
@@ -56,20 +51,30 @@ function App() {
     }
   }, []);
 
-  // リアルタイムカウント（デバウンス付き）
-  const debouncedCount = useCallback(
+  // settings への最新参照（debounce内から安定してアクセスするため）
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
+
+  // リアルタイムカウント（安定した debounce 関数）
+  const debouncedCount = useRef(
     TextCounter.debounce((inputText: string) => {
-      performCount(inputText, settings);
-    }, debounceDelay),
-    [performCount, settings]
-  );
+      performCount(inputText, settingsRef.current);
+    }, debounceDelay)
+  ).current;
+
+  // テキスト保存（debounce 付き）
+  const debouncedSaveText = useRef(
+    TextCounter.debounce((t: string) => {
+      SettingsManager.saveText(t);
+    }, debounceDelay)
+  ).current;
 
   // テキスト変更時の処理
   const handleTextChange = useCallback((newText: string) => {
     setText(newText);
-    
     debouncedCount(newText);
-  }, [settings, debouncedCount]);
+    debouncedSaveText(newText);
+  }, []);
 
   // 設定変更
   const handleSettingsChange = useCallback((newSettings: Partial<AppSettings>) => {
